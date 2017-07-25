@@ -8,6 +8,7 @@ import Helmet from 'react-helmet';
 import config from '../../../config';
 
 import './globals.css';
+import styles from './styles.scss';
 
 import Error404 from './Error404';
 import Header from './Header';
@@ -18,7 +19,7 @@ import AsyncAboutRoute from './AsyncAboutRoute';
 
 function DemoApp() {
   return (
-    <div style={{ padding: '2rem' }}>
+    <div className={styles.app}>
       <Helmet>
         <html lang="en" />
         <title>{config('htmlPage.defaultTitle')}</title>
@@ -112,7 +113,7 @@ function DemoApp() {
         />
       </Helmet>
       <Header />
-      <div style={{ paddingTop: '2rem', paddingBottom: '2rem' }}>
+      <div className={styles.wrapper}>
         <Switch>
           <Route exact path="/" component={AsyncHomeRoute} />
           <Route path="/counter" component={AsyncCounterRoute} />
