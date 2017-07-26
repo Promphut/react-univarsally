@@ -205,7 +205,6 @@ export default function webpackConfigFactory(buildOptions) {
         headers: {
           'Access-Control-Allow-Origin': '*'
         },
-        host:config('host'),
         port:config('clientDevServerPort'),
         https: {
           key: fs.readFileSync('./private/keys/localhost.key'),

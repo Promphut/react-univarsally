@@ -65,6 +65,7 @@
     "classnames": "2.2.5",
     "colors": "1.1.2",
     "compression": "1.6.2",
+    "cors": "^2.8.4",
     "cross-env": "4.0.0",
     "dotenv": "4.0.0",
     "express": "4.15.2",

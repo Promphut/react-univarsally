@@ -15,7 +15,7 @@ const config = {
     port: process.env.PORT || 3000,
 
     FROMDATE: '20170610',
-    PID: '12',
+    PID: '11',
     NAME: 'aomMONEY', // one word, no space
     FACEBOOK: 'aommoneyth',
     FEED_LIMIT: 15,

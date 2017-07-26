@@ -1,7 +1,7 @@
 const auth = require('./auth'),
   Request = require('superagent'),
   { NotFoundError } = require('./errors'),
-  config = require('../config'),
+  config = require('../config.js'),
   utils = require('./utils');
 
 let api = {};
