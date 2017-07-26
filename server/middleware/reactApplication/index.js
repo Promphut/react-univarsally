@@ -18,8 +18,11 @@ import api from '../../../shared/services/api'
  * React application middleware, supports server side rendering.
  */
 export default function reactApplicationMiddleware(request, response, next) {
-  const sheet = new ServerStyleSheet()
-  const cookies = request.universalCookies,
+  global.window = global.window || {}
+	global.navigator = global.navigator || {}
+	global.navigator.userAgent = request.headers['user-agent'] || 'all'
+  const sheet = new ServerStyleSheet();
+  const cookies = request.universalCookies;
   // Ensure a nonce has been provided to us.
   // See the server/middleware/security.js for more info.
   if (typeof response.locals.nonce !== 'string') {

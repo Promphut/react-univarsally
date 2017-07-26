@@ -32,7 +32,7 @@ const values = {
   port: EnvVars.number('PORT', 1337),
 
   // The port on which the client bundle development server should run.
-  clientDevServerPort: EnvVars.number('CLIENT_DEV_PORT', 7331),
+  clientDevServerPort: EnvVars.number('CLIENT_DEV_PORT', 9331),
 
   // This is an example environment variable which is used within the react
   // application to demonstrate the usage of environment variables across

@@ -13,6 +13,7 @@ import errorHandlers from './middleware/errorHandlers';
 import config from '../config';
 import cookiesMiddleware from 'universal-cookie-express';
 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
 // Create our express based server.
 const app = express();
 

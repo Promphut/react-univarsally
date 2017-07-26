@@ -18,7 +18,7 @@ import utils from '../../services/utils';
 import { Route, Switch, Link, Redirect } from 'react-router-dom';
 
 import Footer from '../Footer';
-
+import Test from '../Test';
 // import theme from './themes/default'
 if (process.env.BROWSER) {
   require('../../../public/scss/main.scss');
@@ -30,6 +30,19 @@ if (process.env.BROWSER) {
 injectTapEventPlugin();
 
 class App extends React.Component {
+
+  static childContextTypes = {
+    setting: PropTypes.object,
+  };
+
+  static propTypes = {
+    match: PropTypes.object.isRequired,
+    location: PropTypes.object.isRequired,
+    history: PropTypes.object.isRequired,
+    children: PropTypes.any,
+    cookies: instanceOf(Cookies).isRequired,
+  };
+
   constructor(props, context) {
     super(props);
 
@@ -249,6 +262,7 @@ class App extends React.Component {
               <Switch>
 
                 <Route exact path="/" component={Footer} />
+                <Route exact path="/test" component={Test} />
 
               </Switch>
 
@@ -259,17 +273,5 @@ class App extends React.Component {
     );
   }
 }
-
-App.childContextTypes = {
-  setting: PropTypes.object,
-};
-
-App.propTypes = {
-  match: PropTypes.object.isRequired,
-  location: PropTypes.object.isRequired,
-  history: PropTypes.object.isRequired,
-  children: PropTypes.any,
-  cookies: instanceOf(Cookies).isRequired,
-};
 
 export default withRouter(withCookies(App));

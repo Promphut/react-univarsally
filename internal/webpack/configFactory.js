@@ -200,15 +200,20 @@ export default function webpackConfigFactory(buildOptions) {
       ),
     ]),
 
-    // devServer:
-    //   ifDevClient({
-    //     https: {
-    //       key: fs.readFileSync('./private/keys/localhost.key'),
-    //       cert: fs.readFileSync('./private/keys/localhost.crt'),
-    //       passphrase: 'thepublisher'
-    //     }
-    //   })
-    // ,
+    devServer:
+      ifDevClient({
+        headers: {
+          'Access-Control-Allow-Origin': '*'
+        },
+        host:config('host'),
+        port:config('clientDevServerPort'),
+        https: {
+          key: fs.readFileSync('./private/keys/localhost.key'),
+          cert: fs.readFileSync('./private/keys/localhost.crt'),
+          passphrase: 'thepublisher'
+        }
+      })
+    ,
 
     plugins: removeNil([
       // This grants us source map support, which combined with our webpack
@@ -366,7 +371,7 @@ export default function webpackConfigFactory(buildOptions) {
                 // get interpretted and for the current configuration this will mean
                 // that it will kill our webpack treeshaking feature as the modules
                 // transpilation has not been disabled within in.
-                babelrc: false,
+                babelrc: true,
 
                 presets: [
                   // JSX
@@ -379,7 +384,7 @@ export default function webpackConfigFactory(buildOptions) {
                   // ES201X code into ES5, safe for browsers.  We exclude module
                   // transilation as webpack takes care of this for us, doing
                   // tree shaking in the process.
-                  ifClient(['env', { es2015: { modules: false } }]),
+                  ifClient(['env', { es2015: { modules: true } }]),
                   // For a node bundle we use the specific target against
                   // babel-preset-env so that only the unsupported features of
                   // our target node version gets transpiled.
