@@ -5,6 +5,7 @@ import nodeExternals from 'webpack-node-externals';
 import path from 'path';
 import webpack from 'webpack';
 import WebpackMd5Hash from 'webpack-md5-hash';
+import fs from 'fs';
 
 import { happyPackPlugin } from '../utils';
 import { ifElse } from '../../shared/utils/logic';
@@ -198,6 +199,16 @@ export default function webpackConfigFactory(buildOptions) {
         ),
       ),
     ]),
+
+    // devServer:
+    //   ifDevClient({
+    //     https: {
+    //       key: fs.readFileSync('./private/keys/localhost.key'),
+    //       cert: fs.readFileSync('./private/keys/localhost.crt'),
+    //       passphrase: 'thepublisher'
+    //     }
+    //   })
+    // ,
 
     plugins: removeNil([
       // This grants us source map support, which combined with our webpack

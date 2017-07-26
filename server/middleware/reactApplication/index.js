@@ -4,16 +4,22 @@ import { renderToString, renderToStaticMarkup } from 'react-dom/server';
 import { StaticRouter } from 'react-router-dom';
 import { AsyncComponentProvider, createAsyncContext } from 'react-async-component';
 import asyncBootstrapper from 'react-async-bootstrapper';
+import { CookiesProvider } from 'react-cookie'
 
 import config from '../../../config';
 
 import ServerHTML from './ServerHTML';
-import DemoApp from '../../../shared/components/DemoApp';
+import App from '../../../shared/components/App';
 
+import { ServerStyleSheet } from 'styled-components'
+
+import api from '../../../shared/services/api'
 /**
  * React application middleware, supports server side rendering.
  */
-export default function reactApplicationMiddleware(request, response) {
+export default function reactApplicationMiddleware(request, response, next) {
+  const sheet = new ServerStyleSheet()
+  const cookies = request.universalCookies,
   // Ensure a nonce has been provided to us.
   // See the server/middleware/security.js for more info.
   if (typeof response.locals.nonce !== 'string') {
@@ -43,46 +49,54 @@ export default function reactApplicationMiddleware(request, response) {
   const reactRouterContext = {};
 
   // Declare our React application.
-  const app = (
+  const app = (setting) => sheet.collectStyles(
     <AsyncComponentProvider asyncContext={asyncComponentsContext}>
-      <StaticRouter location={request.url} context={reactRouterContext}>
-        <DemoApp />
-      </StaticRouter>
+      <CookiesProvider cookies={cookies}>
+        <StaticRouter location={request.url} context={reactRouterContext}>
+          <App setting={setting}/>
+        </StaticRouter>
+      </CookiesProvider>
     </AsyncComponentProvider>
   );
 
   // Pass our app into the react-async-component helper so that any async
   // components are resolved for the render.
   asyncBootstrapper(app).then(() => {
-    const appString = renderToString(app);
+    api.getPublisherSetting().then(setting => {
+      if (!setting || !setting.publisher)
+      return next(new Error('Cannot get publisher setting.'))
+      
+      const appString = renderToString(app(setting));
+      const styleTags = sheet.getStyleElement()
+      // Generate the html response.
+      const html = renderToStaticMarkup(
+        <ServerHTML
+          reactAppString={appString}
+          nonce={nonce}
+          helmet={Helmet.rewind()}
+          asyncComponentsState={asyncComponentsContext.getState()}
+          styleTags = {styleTags}
+        />,
+      );
 
-    // Generate the html response.
-    const html = renderToStaticMarkup(
-      <ServerHTML
-        reactAppString={appString}
-        nonce={nonce}
-        helmet={Helmet.rewind()}
-        asyncComponentsState={asyncComponentsContext.getState()}
-      />,
-    );
+      // Check if the router context contains a redirect, if so we need to set
+      // the specific status and redirect header and end the response.
+      if (reactRouterContext.url) {
+        response.status(302).setHeader('Location', reactRouterContext.url);
+        response.end();
+        return;
+      }
 
-    // Check if the router context contains a redirect, if so we need to set
-    // the specific status and redirect header and end the response.
-    if (reactRouterContext.url) {
-      response.status(302).setHeader('Location', reactRouterContext.url);
-      response.end();
-      return;
-    }
-
-    response
-      .status(
-        reactRouterContext.missed
-          ? // If the renderResult contains a "missed" match then we set a 404 code.
-            // Our App component will handle the rendering of an Error404 view.
-            404
-          : // Otherwise everything is all good and we send a 200 OK status.
-            200,
-      )
-      .send(`<!DOCTYPE html>${html}`);
+      response
+        .status(
+          reactRouterContext.missed
+            ? // If the renderResult contains a "missed" match then we set a 404 code.
+              // Our App component will handle the rendering of an Error404 view.
+              404
+            : // Otherwise everything is all good and we send a 200 OK status.
+              200,
+        )
+        .send(`<!DOCTYPE html>${html}`);
+    }).catch(next)
   });
 }
